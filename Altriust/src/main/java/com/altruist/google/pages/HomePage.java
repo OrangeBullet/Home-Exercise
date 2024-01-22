@@ -3,18 +3,24 @@ package com.altruist.google.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomePage extends AbstractPage{
-    private final String URL = "https://www.google.com/finance/";
-    private final String TITLE = "Google Finance";
 
-    private By tickersTable = By.xpath("//div[@id='smart-watchlist-title']/following-sibling::ul//li//a");
+public class HomePage extends AbstractPage {
 
-    public HomePage(WebDriver driver){
+    private static final String URL = "https://www.google.com/finance/";
+    private static final String TITLE = "Google Finance";
+
+    @FindBy(xpath = "//div[@id='smart-watchlist-title']/following-sibling::ul//li//a")
+    private List<WebElement> tickersTableRows;
+
+    public HomePage(WebDriver driver) {
         super(driver);
+        PageFactory.initElements(driver, this);
     }
 
     @Override
@@ -27,20 +33,16 @@ public class HomePage extends AbstractPage{
         return driver.getTitle().contains(TITLE);
     }
 
-    private List<WebElement> getTickersTable(){
-        return driver.findElements(tickersTable);
+    private List<WebElement> getTickersTableRows() {
+        return tickersTableRows;
     }
 
-    public List<String> getTickersSymbolsAsString(){
-        List<WebElement> listOfWebElements = getTickersTable();
-        List<String> listOfSymbols = new ArrayList<String>();
+    public List<String> getTickersSymbolsAsString() {
+        List<String> listOfSymbols = new ArrayList<>();
 
-        for(WebElement x: listOfWebElements){
-            listOfSymbols.add(
-                    x.findElement(By.xpath("div//div//div//div")).getText()
-            );
+        for (WebElement ticker : getTickersTableRows()) {
+            listOfSymbols.add(ticker.findElement(By.xpath("div//div//div//div")).getText());
         }
         return listOfSymbols;
     }
-
 }
